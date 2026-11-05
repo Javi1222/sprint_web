@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Web: Registro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .formulario {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="formulario">
+        <h2>Registro de Usuario</h2>
+        
+        <input type="text" id="cajaNombre" placeholder="Tu nombre">
+        <input type="text" id="cajaApellidos" placeholder="Tus apellidos">
+        
+        <button onclick="enviarDatos()">Enviar a MySQL</button>
+    </div>
+
+    <script>
+        // Esta función se ejecuta al hacer clic en el botón
+        async function enviarDatos() {
+            // 1. Recogemos lo que el usuario ha escrito en las cajas de texto
+            const nombreUsuario = document.getElementById('cajaNombre').value;
+            const apellidosUsuario = document.getElementById('cajaApellidos').value;
+
+            // 2. Comprobamos que no estén vacíos
+            if (nombreUsuario === '' || apellidosUsuario === '') {
+                alert('Por favor, rellena ambos campos.');
+                return;
+            }
+
+            // 3. Empaquetamos los datos y los enviamos al Backend usando "fetch"
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/usuarios', {
+                    method: 'POST', // Método de envío
+                    headers: {
+                        'Content-Type': 'application/json' // Le decimos que enviamos un JSON
+                    },
+                    body: JSON.stringify({ 
+                        nombre: nombreUsuario, 
+                        apellidos: apellidosUsuario 
+                    })
+                });
+
+                // 4. Comprobamos si el backend nos responde que todo ha ido bien
+                if (respuesta.ok) {
+                    alert('¡Datos guardados correctamente en MySQL!');
+                    // Vaciamos las cajas para el siguiente registro
+                    document.getElementById('cajaNombre').value = '';
+                    document.getElementById('cajaApellidos').value = '';
+                } else {
+                    alert('Hubo un problema al guardar los datos.');
+                }
+
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                alert('No se pudo conectar con el servidor Backend.');
+            }
+        }
+    </script>
+
+</body>
+</html>
