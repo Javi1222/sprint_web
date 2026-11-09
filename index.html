@@ -3,101 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint Web: Registro</title>
+    <title>Sprint Web: Registro y Gestión MySQL</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
+            margin: 0;
+            padding: 40px 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
+
+        /* Contenedor principal para organizar ambos formularios */
+        .contenedor-principal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            max-width: 950px;
+            width: 100%;
+        }
+
+        /* Estilo general para las tarjetas de cada formulario */
         .formulario {
             background: white;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 440px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #333;
             text-align: center;
         }
-        input {
+
+        .descripcion {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        input, select {
             display: block;
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
+            margin: 8px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+            font-size: 14px;
         }
-        button {
+
+        /* Botón verde de acción principal */
+        .btn-primario {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 4px;
             cursor: pointer;
             width: 100%;
-            font-size: 16px;
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background 0.2s;
         }
-        button:hover {
+        .btn-primario:hover {
             background-color: #218838;
+        }
+
+        /* Botón azul secundario para añadir filas */
+        .btn-secundario {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 5px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .btn-secundario:hover {
+            background-color: #0069d9;
+        }
+
+        /* Fila dinámica para cada columna */
+        .fila-columna {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .fila-columna input {
+            flex: 2;
+            margin: 0;
+        }
+        .fila-columna select {
+            flex: 2;
+            margin: 0;
+        }
+        .btn-eliminar {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-eliminar:hover {
+            background-color: #c82333;
+        }
+
+        /* Indicador visual de la Primary Key automática */
+        .nota-id {
+            background-color: #e9ecef;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #495057;
+            margin-bottom: 12px;
         }
     </style>
 </head>
 <body>
 
-    <div class="formulario">
-        <h2>Registro de Usuario</h2>
-        
-        <input type="text" id="cajaNombre" placeholder="Tu nombre">
-        <input type="text" id="cajaApellidos" placeholder="Tus apellidos">
-        
-        <button onclick="enviarDatos()">Enviar a MySQL</button>
+    <div class="contenedor-principal">
+
+        <!-- ========================================================= -->
+        <!-- FORMULARIO 1: REGISTRO DE USUARIOS                        -->
+        <!-- ========================================================= -->
+        <div class="formulario">
+            <h2>Registro de Usuario</h2>
+            <p class="descripcion">Inserta un nuevo registro en la tabla 'usuarios'</p>
+            
+            <label for="cajaNombre">Nombre</label>
+            <input type="text" id="cajaNombre" placeholder="Ej: Lucas">
+            
+            <label for="cajaApellidos">Apellidos</label>
+            <input type="text" id="cajaApellidos" placeholder="Ej: García Pérez">
+            
+            <button class="btn-primario" onclick="enviarDatos()">Enviar a MySQL</button>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- FORMULARIO 2: CREAR TABLA EN MYSQL                        -->
+        <!-- ========================================================= -->
+        <div class="formulario">
+            <h2>Crear Tabla en MySQL</h2>
+            <p class="descripcion">Define el nombre de la tabla y sus campos</p>
+
+            <label for="cajaNombreTabla">Nombre de la Tabla</label>
+            <input type="text" id="cajaNombreTabla" placeholder="Ej: productos, clientes, pedidos">
+
+            <div class="nota-id">
+                ℹ️ <strong>Clave Primaria automática:</strong> Se creará siempre un campo <code>id INT AUTO_INCREMENT PRIMARY KEY</code>.
+            </div>
+
+            <label>Columnas adicionales:</label>
+            <div id="contenedorColumnas">
+                <!-- Columna inicial con atributos accesibles (title y aria-label) -->
+                <div class="fila-columna">
+                    <input type="text" class="col-nombre" placeholder="Nombre (ej: titulo)" value="nombre" aria-label="Nombre de la columna" title="Nombre de la columna">
+                    <select class="col-tipo" title="Tipo de dato de la columna" aria-label="Tipo de dato de la columna">
+                        <option value="VARCHAR(100)">VARCHAR(100)</option>
+                        <option value="VARCHAR(255)">VARCHAR(255)</option>
+                        <option value="INT">INT</option>
+                        <option value="DECIMAL(10,2)">DECIMAL(10,2)</option>
+                        <option value="TEXT">TEXT</option>
+                        <option value="DATE">DATE</option>
+                        <option value="DATETIME">DATETIME</option>
+                        <option value="BOOLEAN">BOOLEAN</option>
+                    </select>
+                    <button type="button" class="btn-eliminar" onclick="eliminarFila(this)" title="Eliminar fila" aria-label="Eliminar fila">✕</button>
+                </div>
+            </div>
+
+            <button type="button" class="btn-secundario" onclick="agregarFilaColumna()">+ Añadir otra columna</button>
+
+            <button class="btn-primario" onclick="crearTablaMySQL()">Crear Tabla en MySQL</button>
+        </div>
+
     </div>
 
     <script>
-        // Esta función se ejecuta al hacer clic en el botón
+        // =========================================================================
+        // FORMULARIO 1: ENVIAR DATOS DE USUARIO
+        // =========================================================================
         async function enviarDatos() {
-            // 1. Recogemos lo que el usuario ha escrito en las cajas de texto
-            const nombreUsuario = document.getElementById('cajaNombre').value;
-            const apellidosUsuario = document.getElementById('cajaApellidos').value;
+            const nombreUsuario = document.getElementById('cajaNombre').value.trim();
+            const apellidosUsuario = document.getElementById('cajaApellidos').value.trim();
 
-            // 2. Comprobamos que no estén vacíos
-            if (nombreUsuario === '' || apellidosUsuario === '') {
+            if (!nombreUsuario || !apellidosUsuario) {
                 alert('Por favor, rellena ambos campos.');
                 return;
             }
 
-            // 3. Empaquetamos los datos y los enviamos al Backend usando "fetch"
             try {
                 const respuesta = await fetch('http://localhost:3000/api/usuarios', {
-                    method: 'POST', // Método de envío
-                    headers: {
-                        'Content-Type': 'application/json' // Le decimos que enviamos un JSON
-                    },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         nombre: nombreUsuario, 
                         apellidos: apellidosUsuario 
                     })
                 });
 
-                // 4. Comprobamos si el backend nos responde que todo ha ido bien
                 if (respuesta.ok) {
                     alert('¡Datos guardados correctamente en MySQL!');
-                    // Vaciamos las cajas para el siguiente registro
                     document.getElementById('cajaNombre').value = '';
                     document.getElementById('cajaApellidos').value = '';
                 } else {
-                    alert('Hubo un problema al guardar los datos.');
+                    const errorData = await respuesta.json();
+                    alert(`Error: ${errorData.error || 'Hubo un problema al guardar los datos.'}`);
                 }
-
             } catch (error) {
                 console.error('Error de conexión:', error);
                 alert('No se pudo conectar con el servidor Backend.');
             }
         }
-    </script>
 
+        // =========================================================================
+        // FORMULARIO 2: CREACIÓN DINÁMICA DE TABLAS
+        // =========================================================================
+
+        /**
+         * Agrega una nueva fila de columna con atributos de accesibilidad
+         */
+        function agregarFilaColumna() {
+            const contenedor = document.getElementById('contenedorColumnas');
+            const nuevaFila = document.createElement('div');
+            nuevaFila.className = 'fila-columna';
+
+            nuevaFila.innerHTML = `
+                <input type="text" class="col-nombre" placeholder="Nombre columna" aria-label="Nombre de la columna" title="Nombre de la columna">
+                <select class="col-tipo" title="Tipo de dato de la columna" aria-label="Tipo de dato de la columna">
+                    <option value="VARCHAR(100)">VARCHAR(100)</option>
+                    <option value="VARCHAR(255)">VARCHAR(255)</option>
+                    <option value="INT">INT</option>
+                    <option value="DECIMAL(10,2)">DECIMAL(10,2)</option>
+                    <option value="TEXT">TEXT</option>
+                    <option value="DATE">DATE</option>
+                    <option value="DATETIME">DATETIME</option>
+                    <option value="BOOLEAN">BOOLEAN</option>
+                </select>
+                <button type="button" class="btn-eliminar" onclick="eliminarFila(this)" title="Eliminar fila" aria-label="Eliminar fila">✕</button>
+            `;
+
+            contenedor.appendChild(nuevaFila);
+        }
+
+        /**
+         * Elimina la fila de la columna seleccionada
+         */
+        function eliminarFila(boton) {
+            const fila = boton.parentElement;
+            fila.remove();
+        }
+
+        /**
+         * Envía los datos de la nueva tabla a la API
+         */
+        async function crearTablaMySQL() {
+            const nombreTabla = document.getElementById('cajaNombreTabla').value.trim();
+
+            if (!nombreTabla) {
+                alert('Debes indicar un nombre para la tabla (ej: "productos").');
+                return;
+            }
+
+            const regexIdentificador = /^[a-zA-Z0-9_]+$/;
+            if (!regexIdentificador.test(nombreTabla)) {
+                alert('El nombre de la tabla solo puede contener letras, números y guiones bajos (sin espacios ni caracteres especiales).');
+                return;
+            }
+
+            const filas = document.querySelectorAll('#contenedorColumnas .fila-columna');
+            const columnas = [];
+
+            for (const fila of filas) {
+                const nombreCol = fila.querySelector('.col-nombre').value.trim();
+                const tipoCol = fila.querySelector('.col-tipo').value;
+
+                if (nombreCol) {
+                    if (!regexIdentificador.test(nombreCol)) {
+                        alert(`El nombre de columna "${nombreCol}" no es válido. Usa solo letras, números y guiones bajos.`);
+                        return;
+                    }
+                    columnas.push({ nombre: nombreCol, tipo: tipoCol });
+                }
+            }
+
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/tablas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        nombreTabla: nombreTabla, 
+                        columnas: columnas 
+                    })
+                });
+
+                const resultado = await respuesta.json();
+
+                if (respuesta.ok) {
+                    alert(`¡Éxito! ${resultado.mensaje}`);
+                    document.getElementById('cajaNombreTabla').value = '';
+                } else {
+                    alert(`Error: ${resultado.error || 'No se pudo crear la tabla.'}`);
+                }
+            } catch (error) {
+                console.error('Error al conectar con el servidor:', error);
+                alert('No se pudo conectar con el servidor backend (revisa que server.js esté encendido).');
+            }
+        }
+    </script>
 </body>
 </html>

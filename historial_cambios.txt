@@ -1,0 +1,166 @@
+================================================================================
+          DOCUMENTACIÓN TÉCNICA Y REGISTRO DE CAMBIOS DEL PROYECTO
+                     Proyecto: Sprint Web Full-Stack
+                 Módulo: Bases de Datos (1º GS - DAM)
+================================================================================
+
+Este documento contiene la explicación completa del funcionamiento de la 
+aplicación web (combinando la arquitectura y fases del proyecto con los apuntes 
+técnicos) junto con el registro histórico de todas las tareas y cambios realizados.
+
+================================================================================
+PARTE 1: EXPLICACIÓN COMPLETA DE CÓMO FUNCIONA EL PROGRAMA (FULL-STACK)
+================================================================================
+
+1. ARQUITECTURA DEL SISTEMA EN 3 CAPAS
+--------------------------------------------------------------------------------
+La aplicación sigue el modelo clásico cliente-servidor desacoplado en tres capas:
+
+  A) CAPA DE PRESENTACIÓN / FRONTEND (index.html + CSS + Vanilla JS):
+     - Se ejecuta directamente en el navegador web del usuario.
+     - Captura los datos ingresados en los formularios mediante el DOM.
+     - Utiliza la API nativa 'fetch()' de forma asíncrona (async/await) para enviar
+       y recibir información en formato JSON hacia el backend sin recargar la página.
+
+  B) CAPA LÓGICA / BACKEND (Node.js + Express en puerto 3000):
+     - Servidor HTTP intermediario construido en Node.js con Express (server.js).
+     - Habilita 'cors()' para permitir peticiones cruzadas desde el navegador.
+     - Interpreta el cuerpo de las peticiones mediante el middleware 'express.json()'.
+     - Aplica validaciones de seguridad (expresiones regulares y listas blancas).
+     - Gestiona la conexión persistente con MySQL y ejecuta las sentencias SQL.
+
+  C) CAPA DE DATOS (MySQL Server 8.0 en puerto 3306):
+     - Motor relacional de base de datos que garantiza almacenamiento persistente,
+       atomicidad e integridad de la información en disco duro.
+     - Base de datos utilizada: 'sprint_web'.
+
+
+2. FLUJO COMPLETO DE LOS DOS CASOS DE USO DE LA APLICACIÓN
+--------------------------------------------------------------------------------
+
+CASO DE USO 1: REGISTRO DE UN NUEVO USUARIO
+-------------------------------------------
+1. El usuario introduce su nombre y apellidos en el formulario 1 y pulsa "Enviar a MySQL".
+2. La función JavaScript 'enviarDatos()' (Frontend) valida que los campos no estén vacíos.
+3. Se serializan los datos en formato JSON: { "nombre": "...", "apellidos": "..." }.
+4. 'fetch()' lanza una petición asíncrona HTTP POST a 'http://localhost:3000/api/usuarios'.
+5. El servidor Express (Backend) intercepta la petición en la ruta '/api/usuarios'.
+6. 'express.json()' parsea el JSON y extrae 'nombre' y 'apellidos' de 'req.body'.
+7. Se ejecuta la consulta parametrizada:
+      INSERT INTO usuarios (nombre, apellidos) VALUES (?, ?)
+   (El uso de '?' delega en el driver mysql2 el escape de caracteres, blindando la app
+   contra inyecciones SQL en valores literales).
+8. MySQL guarda físicamente el registro asignando un 'id' autoincremental único.
+9. El backend recibe el acuse de recibo de MySQL y responde al frontend con HTTP 200/201.
+10. El frontend recibe la confirmación ('respuesta.ok'), muestra una alerta de éxito
+    y vacía los campos del formulario.
+
+CASO DE USO 2: CREACIÓN DINÁMICA DE TABLAS EN MYSQL
+---------------------------------------------------
+1. El usuario ingresa el nombre de la tabla que desea crear (ej: 'productos') y define
+   sus columnas adicionales (nombre y tipo de dato: VARCHAR, INT, DECIMAL, etc.).
+2. La interfaz permite añadir o retirar filas de columnas de manera 100% interactiva.
+3. Al pulsar "Crear Tabla en MySQL", la función 'crearTablaMySQL()' valida en el cliente
+   los identificadores mediante expresiones regulares (/^[a-zA-Z0-9_]+$/).
+4. Se envía un objeto JSON estructurado mediante POST a 'http://localhost:3000/api/tablas':
+   {
+      "nombreTabla": "productos",
+      "columnas": [ { "nombre": "precio", "tipo": "DECIMAL(10,2)" } ]
+   }
+5. El backend realiza una doble capa de seguridad crítica:
+   * En SQL, los nombres de tablas y columnas (identificadores) NO admiten parámetros '?'.
+   * Por ello, el servidor valida el nombre con regex y contrasta cada tipo contra una
+     lista blanca permitida (VARCHAR, INT, TEXT, DATE, etc.).
+6. Se construye de forma segura la sentencia DDL:
+      CREATE TABLE IF NOT EXISTS `nombreTabla` (`id` INT AUTO_INCREMENT PRIMARY KEY, ...)
+7. El driver 'mysql2' despacha la sentencia mediante protocolo TCP hacia MySQL.
+8. La tabla queda creada físicamente en el esquema 'sprint_web' de MySQL.
+9. El backend devuelve un estado HTTP 201 confirmando la creación y el frontend muestra
+   un mensaje de éxito en pantalla.
+
+
+3. PROTOCOLOS Y COMUNICACIÓN ENTRE CAPAS
+--------------------------------------------------------------------------------
+   [ 1. FRONTEND: Navegador ]
+             |
+             |  Petición HTTP (POST) / Formato JSON
+             v
+   [ 2. BACKEND: Express (Puerto 3000) ]
+             |
+             |  Protocolo binario TCP / Driver mysql2 / Puerto 3306
+             v
+   [ 3. BASE DE DATOS: MySQL 8.0 (Puerto 3306) ]
+
+
+================================================================================
+PARTE 2: REGISTRO HISTÓRICO DE CAMBIOS Y ACTIVIDADES REALIZADAS
+================================================================================
+
+--------------------------------------------------------------------------------
+1. CONFIGURACIÓN DE SEGURIDAD EN GIT (.gitignore)
+--------------------------------------------------------------------------------
+- Fecha: 05/11/2026
+- Archivo afectado: .gitignore
+- Objetivo: Evitar la subida a GitHub de carpetas masivas y archivos sensibles.
+- Acciones realizadas:
+  * Creación del archivo '.gitignore' en la raíz.
+  * Configuración de reglas para ignorar:
+    - 'node_modules/' (evita colapsar el repositorio y agiliza las subidas).
+    - Logs de ejecución ('npm-debug.log*', 'yarn-debug.log*').
+    - Variables de entorno locales ('.env', '.env.local').
+    - Archivos del sistema operativo ('.DS_Store', 'Thumbs.db').
+
+--------------------------------------------------------------------------------
+2. PROTECCIÓN DE CREDENCIALES Y AUDITORÍA DE SEGURIDAD
+--------------------------------------------------------------------------------
+- Fecha: 05/11/2026
+- Archivos afectados: server.js, .env, .env.example, package.json
+- Objetivo: Retirar contraseñas en texto plano del código fuente antes de publicar.
+- Acciones realizadas:
+  * Instalación e integración del paquete 'dotenv'.
+  * Refactorización de 'server.js': Se reemplazaron las claves fijas por variables
+    del sistema ('process.env.DB_HOST', 'process.env.DB_USER', 'process.env.DB_PASSWORD',
+    'process.env.DB_NAME').
+  * Creación del archivo confidencial '.env' (protegido por .gitignore) con las
+    credenciales reales de MySQL del entorno de desarrollo.
+  * Creación del archivo público de plantilla '.env.example' con valores simulados
+    ('tu_contraseña_aqui') para que otros colaboradores sepan qué variables definir.
+  * Enmienda de commit ('git commit --amend'): Se sobrescribió el commit inicial local
+    para purgar por completo cualquier rastro anterior de la contraseña en el historial.
+
+--------------------------------------------------------------------------------
+3. NUEVO FORMULARIO Y BACKEND PARA CREAR TABLAS EN MYSQL
+--------------------------------------------------------------------------------
+- Fecha: 06/11/2026
+- Archivos afectados: index.html, server.js
+- Objetivo: Diseñar una interfaz interactiva y su respectivo endpoint backend para
+  generar tablas relacionales en MySQL con fines didácticos en DAM.
+- Acciones en el Frontend ('index.html'):
+  * Implementación de diseño en tarjetas independientes con CSS Flexbox.
+  * Formulario con campo para el nombre de la tabla y clave primaria autoincremental
+    automática ('id INT AUTO_INCREMENT PRIMARY KEY').
+  * Contenedor dinámico de campos con botones para añadir y remover columnas con sus
+    respectivos tipos de datos MySQL.
+  * Programación de la función asíncrona 'crearTablaMySQL()' conectada con la API.
+- Acciones en el Backend ('server.js'):
+  * Creación de la ruta 'POST /api/tablas'.
+  * Filtro de seguridad por regex (/^[a-zA-Z0-9_]+$/) y lista blanca de tipos para
+    prevenir inyecciones SQL en identificadores.
+  * Ensamblado seguro con comillas invertidas (backticks) y ejecución de
+    'CREATE TABLE IF NOT EXISTS'.
+  * Documentación con comentarios paso a paso en todo el código.
+
+--------------------------------------------------------------------------------
+4. CORRECCIÓN DE DIAGNÓSTICOS, SINTAXIS Y ACCESIBILIDAD
+--------------------------------------------------------------------------------
+- Fecha: 06/11/2026
+- Archivo afectado: index.html
+- Objetivo: Resolver avisos de accesibilidad y errores de sintaxis reportados por el editor.
+- Acciones realizadas:
+  * Accesibilidad (axe/forms: select-name): Inclusión de 'title' y 'aria-label' en todos
+    los selectores e inputs dinámicos.
+  * Variables duplicadas: Eliminación de la doble declaración de 'nombreUsuario' y
+    'apellidosUsuario' en la función 'enviarDatos()'.
+  * Balance de estructura: Corrección y verificación de apertura y cierre de llaves en CSS
+    y JavaScript, asegurando compatibilidad y ejecución sin fallos.
+================================================================================
