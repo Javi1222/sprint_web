@@ -163,4 +163,20 @@ PARTE 2: REGISTRO HISTÓRICO DE CAMBIOS Y ACTIVIDADES REALIZADAS
     'apellidosUsuario' en la función 'enviarDatos()'.
   * Balance de estructura: Corrección y verificación de apertura y cierre de llaves en CSS
     y JavaScript, asegurando compatibilidad y ejecución sin fallos.
+
+--------------------------------------------------------------------------------
+5. CORRECCIÓN DEL DISEÑO Y POSICIONAMIENTO DEL FOOTER (FLEXBOX)
+--------------------------------------------------------------------------------
+- Fecha: 09/11/2026
+- Archivo afectado: index.html
+- Objetivo: Corregir el posicionamiento del pie de página para que no se coloque
+  al lado de los formularios y quede anclado abajo a ancho completo.
+- Acciones realizadas:
+  * En 'body': se agregó 'flex-direction: column' y 'align-items: center' para que
+    el contenedor de formularios y el pie de página se apilen verticalmente.
+  * En '.contenedor-principal': se añadió 'flex: 1' para que ocupe todo el espacio
+    disponible y empuje de forma natural el footer hacia el final de la pantalla.
+  * En 'footer' e '#footer_node': se configuró 'width: 100%', distribución con
+    'justify-content: space-between', padding cómodo y color de texto blanco para
+    un diseño responsivo y limpio.
 ================================================================================
