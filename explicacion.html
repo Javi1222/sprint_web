@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documentación Técnica: Sprint Web Full-Stack</title>
+
+    <!-- Fuentes de Google -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Highlight.js para el tema oscuro estilo VS Code -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <style>
+      :root {
+        --primary-blue: #0f4c81; /* Azul corporativo estable */
+        --secondary-blue: #007bff; /* Azul brillante para enlaces/botones */
+        --bg-body: #f4f7f6;
+        --bg-sidebar: #ffffff;
+        --bg-content: #ffffff;
+        --text-main: #333333;
+        --text-muted: #6c757d;
+        --border-color: #e9ecef;
+        --code-bg: #1e1e1e; /* Color exacto de VS Code */
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--text-main);
+        background-color: var(--bg-body);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* --- MENÚ LATERAL (SIDEBAR) --- */
+      .sidebar {
+        width: 280px;
+        background-color: var(--bg-sidebar);
+        border-right: 1px solid var(--border-color);
+        padding: 30px 20px;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
+        flex-shrink: 0;
+      }
+
+      .sidebar-header {
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--primary-blue);
+      }
+
+      .sidebar-header h2 {
+        color: var(--primary-blue);
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .sidebar-header p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+      }
+
+      .sidebar nav ul {
+        list-style: none;
+      }
+
+      .sidebar nav ul li {
+        margin-bottom: 12px;
+      }
+
+      .sidebar nav ul li a {
+        text-decoration: none;
+        color: var(--text-main);
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition:
+          color 0.2s,
+          padding-left 0.2s;
+        display: block;
+        padding: 6px 0;
+      }
+
+      .sidebar nav ul li a:hover {
+        color: var(--secondary-blue);
+        padding-left: 5px;
+      }
+
+      .sidebar nav ul li ul {
+        padding-left: 15px;
+        margin-top: 8px;
+        border-left: 2px solid var(--border-color);
+      }
+
+      .sidebar nav ul li ul li a {
+        font-weight: 400;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      /* --- CONTENIDO PRINCIPAL --- */
+      .main-content {
+        flex: 1;
+        padding: 50px 80px;
+        overflow-y: auto;
+        background-color: var(--bg-content);
+        scroll-behavior: smooth;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: var(--primary-blue);
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      section {
+        margin-bottom: 60px;
+        padding-top: 20px; /* Offset for anchor links */
+      }
+
+      h2 {
+        color: var(--primary-blue);
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      h3 {
+        color: var(--text-main);
+        font-size: 1.3rem;
+        margin-top: 30px;
+        margin-bottom: 15px;
+      }
+
+      p,
+      li {
+        line-height: 1.7;
+        margin-bottom: 15px;
+      }
+
+      ul,
+      ol {
+        padding-left: 20px;
+        margin-bottom: 20px;
+      }
+
+      /* --- BLOQUES DE CÓDIGO (ESTILO VS CODE) --- */
+      .code-container {
+        position: relative;
+        margin: 25px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .code-header {
+        background-color: #2d2d2d;
+        color: #cccccc;
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        font-family: "Inter", sans-serif;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #1e1e1e;
+      }
+
+      .copy-btn {
+        background-color: transparent;
+        color: #cccccc;
+        border: 1px solid #555;
+        border-radius: 4px;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .copy-btn:hover {
+        background-color: #444;
+        color: white;
+      }
+
+      pre {
+        margin: 0 !important;
+        padding: 20px !important;
+        background-color: var(--code-bg) !important;
+      }
+
+      code {
+        font-family: "Fira Code", monospace !important;
+        font-size: 0.9rem !important;
+        line-height: 1.5;
+      }
+
+      /* Tablas */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--border-color);
+        padding: 12px 15px;
+        text-align: left;
+      }
+
+      th {
+        background-color: var(--bg-body);
+        color: var(--primary-blue);
+        font-weight: 600;
+      }
+
+      .alert-box {
+        background-color: #e7f3fe;
+        border-left: 4px solid var(--secondary-blue);
+        padding: 15px 20px;
+        border-radius: 0 4px 4px 0;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- MENÚ LATERAL -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Sprint Web</h2>
+        <p>1º DAM - Bases de Datos</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#introduccion">1. Introducción y Arquitectura</a></li>
+          <li><a href="#fase1">2. Fase 1: Base de Datos (MySQL)</a></li>
+          <li>
+            <a href="#fase2">3. Fase 2: Backend (Node.js)</a>
+            <ul>
+              <li><a href="#fase2-init">3.1. Inicialización</a></li>
+              <li><a href="#fase2-seguridad">3.2. Seguridad (.env)</a></li>
+              <li><a href="#fase2-codigo">3.3. Código del Servidor</a></li>
+            </ul>
+          </li>
+          <li><a href="#fase3">4. Fase 3: Frontend (HTML/JS)</a></li>
+          <li><a href="#changelog">5. Registro de Cambios</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+      <div class="container">
+        <header>
+          <h1>Documentación Técnica: Proyecto Full-Stack</h1>
+          <p class="subtitle">
+            Guía de estudio paso a paso para la integración de Frontend, Backend
+            y MySQL.
+          </p>
+        </header>
+
+        <!-- SECCIÓN 1 -->
+        <section id="introduccion">
+          <h2>1. Introducción y Arquitectura</h2>
+          <p>
+            Este documento detalla la construcción de una aplicación web
+            completa estructurada en tres capas independientes. Este diseño
+            asegura que cada componente tenga una responsabilidad única,
+            facilitando la escalabilidad y el mantenimiento del software.
+          </p>
+          <ul>
+            <li>
+              <strong>Capa de Presentación (Frontend):</strong> Desarrollada en
+              HTML, CSS y JavaScript nativo. Se encarga de capturar las
+              interacciones del usuario y comunicarse de forma asíncrona
+              mediante la API <code>fetch()</code>.
+            </li>
+            <li>
+              <strong>Capa Lógica (Backend):</strong> Implementada con Node.js y
+              el framework Express. Actúa como intermediario, procesa las
+              peticiones HTTP, aplica reglas de validación y gestiona la
+              seguridad (CORS, inyecciones SQL).
+            </li>
+            <li>
+              <strong>Capa de Datos (Base de Datos):</strong> Soportada por
+              MySQL 8.0. Garantiza la persistencia de la información estructural
+              y de los registros de usuarios.
+            </li>
+          </ul>
+        </section>
+
+        <!-- SECCIÓN 2 -->
+        <section id="fase1">
+          <h2>2. Fase 1: Preparación de la Base de Datos</h2>
+          <p>
+            El primer paso metodológico es establecer el modelo de datos físico.
+            Desde la interfaz de línea de comandos de MySQL o mediante MySQL
+            Workbench, creamos el entorno de almacenamiento.
+          </p>
+
+          <div class="alert-box">
+            <strong>Nota operativa:</strong> Nos aseguramos de configurar
+            previamente los permisos del usuario administrador (<code
+              >root</code
+            >
+            o <code>admin</code>) utilizando la instrucción
+            <code>ALTER USER</code> y <code>GRANT ALL PRIVILEGES</code> para
+            garantizar la correcta conexión desde el Backend.
+          </div>
+
+          <div class="code-container">
+            <div class="code-header">
+              <span>sql</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code class="language-sql">-- 1. Creación de la base de datos
+CREATE DATABASE sprint_web;
+USE sprint_web;
+
+-- 2. Creación de la tabla principal para el registro de usuarios
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL
+);</code></pre>
+          </div>
+        </section>
+
+        <!-- SECCIÓN 3 -->
+        <section id="fase2">
+          <h2>3. Fase 2: Construcción del Backend (Node.js)</h2>
+          <p>
+            El servidor es el núcleo de la aplicación. Recibirá los datos en
+            formato JSON desde el navegador y los inyectará de forma segura en
+            la base de datos.
+          </p>
+
+          <h3 id="fase2-init">3.1. Inicialización y Dependencias</h3>
+          <p>
+            Abrimos la terminal integrada del editor (VS Code / Cursor) en el
+            directorio del proyecto y ejecutamos la inicialización del
+            ecosistema Node, seguido de la instalación de los paquetes
+            requeridos.
+          </p>
+
+          <div class="code-container">
+            <div class="code-header">
+              <span>bash</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code class="language-bash"># Inicializa el archivo package.json
+npm init -y
+
+# Instalación de los módulos esenciales
+npm install express mysql2 cors dotenv</code></pre>
+          </div>
+
+          <h3 id="fase2-seguridad">
+            3.2. Gestión de Credenciales Seguras (.env)
+          </h3>
+          <p>
+            Para evitar exponer credenciales críticas en repositorios públicos
+            (GitHub), implementamos variables de entorno. Creamos un archivo
+            <code>.env</code> en la raíz del proyecto. Este archivo
+            <strong>debe ser excluido</strong> en el <code>.gitignore</code>.
+          </p>
+
+          <div class="code-container">
+            <div class="code-header">
+              <span>.env</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code class="language-env">DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=tu_contraseña_real_aqui
+DB_NAME=sprint_web
+PORT=3000</code></pre>
+          </div>
+
+          <h3 id="fase2-codigo">3.3. Lógica del Servidor (server.js)</h3>
+          <p>
+            Implementamos el servidor con Express. Este archivo incluye la
+            conexión a MySQL usando las variables de entorno y define dos
+            <em>endpoints</em>: uno para guardar usuarios (con consultas
+            parametrizadas <code>?</code> para evitar inyecciones SQL) y otro
+            para crear tablas dinámicamente (con validación Regex).
+          </p>
+
+          <div class="code-container">
+            <div class="code-header">
+              <span>server.js</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code class="language-javascript">require('dotenv').config(); // Carga las variables del archivo .env
+const express = require('express');
+const mysql = require('mysql2');
+const cors = require('cors');
+
+const app = express();
+
+// Middlewares fundamentales
+app.use(cors()); 
+app.use(express.json()); 
+
+// 1. Configuración de la conexión a MySQL usando entorno seguro
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+});
+
+db.connect((err) => {
+    if (err) {
+        console.error('Error crítico: Conexión denegada a MySQL:', err);
+        return;
+    }
+    console.log('¡Conexión exitosa a la base de datos MySQL!');
+});
+
+// 2. ENDPOINT: Registro de Usuarios
+app.post('/api/usuarios', (req, res) => {
+    const { nombre, apellidos } = req.body;
+    
+    // Consulta parametrizada (los '?' protegen contra SQL Injection)
+    const sql = 'INSERT INTO usuarios (nombre, apellidos) VALUES (?, ?)';
+    
+    db.query(sql, [nombre, apellidos], (err, result) => {
+        if (err) {
+            console.error('Error insertando datos:', err);
+            return res.status(500).json({ error: 'Error interno del servidor' });
+        }
+        console.log(`Usuario registrado: ${nombre} ${apellidos}`);
+        res.status(200).json({ mensaje: 'Datos guardados correctamente' });
+    });
+});
+
+// 3. Inicialización del puerto de escucha
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Backend operativo en http://localhost:${PORT}`);
+});</code></pre>
+          </div>
+        </section>
+
+        <!-- SECCIÓN 4 -->
+        <section id="fase3">
+          <h2>4. Fase 3: Interfaz de Usuario (Frontend)</h2>
+          <p>
+            El cliente web está diseñado para ser ligero. Utiliza un diseño
+            basado en Flexbox y maneja la comunicación con el Backend de forma
+            asíncrona, proporcionando retroalimentación visual al usuario sin
+            recargar la página.
+          </p>
+
+          <div class="code-container">
+            <div class="code-header">
+              <span>index.html</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Registro de Sistema&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 { color: #0f4c81; margin-bottom: 25px; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: #007bff; outline: none; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover { background-color: #0056b3; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;div class="card"&gt;
+        &lt;h2&gt;Registro de Usuario&lt;/h2&gt;
+        
+        &lt;div class="form-group"&gt;
+            &lt;input type="text" id="nombre" placeholder="Nombre completo" aria-label="Nombre"&gt;
+        &lt;/div&gt;
+        &lt;div class="form-group"&gt;
+            &lt;input type="text" id="apellidos" placeholder="Apellidos" aria-label="Apellidos"&gt;
+        &lt;/div&gt;
+        
+        &lt;button onclick="registrarUsuario()"&gt;Guardar en MySQL&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+        async function registrarUsuario() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const apellidos = document.getElementById('apellidos').value.trim();
+
+            if (!nombre || !apellidos) {
+                alert('Atención: Todos los campos son obligatorios.');
+                return;
+            }
+
+            try {
+                // Petición asíncrona al Backend
+                const response = await fetch('http://localhost:3000/api/usuarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, apellidos })
+                });
+
+                if (response.ok) {
+                    alert('Operación exitosa: Usuario almacenado en la Base de Datos.');
+                    document.getElementById('nombre').value = '';
+                    document.getElementById('apellidos').value = '';
+                } else {
+                    alert('Error en la transacción del servidor.');
+                }
+            } catch (error) {
+                console.error('Fallo en la comunicación red:', error);
+                alert('Error de conexión con el Backend.');
+            }
+        }
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+        </section>
+
+        <!-- SECCIÓN 5 -->
+        <section id="changelog">
+          <h2>5. Registro de Cambios y Auditoría (Changelog)</h2>
+          <p>
+            Historial técnico de resolución de problemas e implementaciones de
+            seguridad aplicadas a lo largo del sprint.
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Módulo Afectado</th>
+                <th>Descripción Técnico-Operativa</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>05/11/2026</td>
+                <td><code>.gitignore</code></td>
+                <td>
+                  Implementación de reglas de exclusión para evitar la subida de
+                  directorios pesados (<code>node_modules/</code>) y archivos de
+                  entorno sensibles (<code>.env</code>) al repositorio central.
+                </td>
+              </tr>
+              <tr>
+                <td>05/11/2026</td>
+                <td><code>server.js</code></td>
+                <td>
+                  Refactorización estructural: Extracción de credenciales
+                  hardcodeadas (<code>root</code>, contraseñas planas).
+                  Integración de la librería <code>dotenv</code> para consumir
+                  las credenciales mediante <code>process.env</code>.
+                </td>
+              </tr>
+              <tr>
+                <td>06/11/2026</td>
+                <td><code>MySQL / server.js</code></td>
+                <td>
+                  Resolución del error
+                  <code>ER_ACCESS_DENIED_ERROR (1045)</code>. El usuario
+                  <code>'admin'@'%'</code> experimentaba conflictos de
+                  procedencia local. Se restableció la contraseña de
+                  <code>root</code> vía MySQL Workbench y se actualizó el
+                  acceso.
+                </td>
+              </tr>
+              <tr>
+                <td>06/11/2026</td>
+                <td><code>index.html</code></td>
+                <td>
+                  Corrección de accesibilidad detectada por el linter
+                  (axe/forms). Se añadieron atributos <code>aria-label</code> y
+                  se mejoró la validación preventiva en el cliente antes de la
+                  ejecución del <code>fetch()</code>.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+
+    <!-- Script para inicializar resaltado de código y lógica del botón copiar -->
+    <script>
+      // Inicializa Highlight.js (tema VS Code)
+      document.addEventListener("DOMContentLoaded", (event) => {
+        document.querySelectorAll("pre code").forEach((el) => {
+          hljs.highlightElement(el);
+        });
+      });
+
+      // Función para los botones de copiar código
+      function copyCode(buttonElement) {
+        // El elemento pre está justo debajo del contenedor header en el HTML
+        const codeContainer = buttonElement.parentElement.nextElementSibling;
+        const textToCopy = codeContainer.innerText;
+
+        navigator.clipboard
+          .writeText(textToCopy)
+          .then(() => {
+            const originalText = buttonElement.innerText;
+            buttonElement.innerText = "¡Copiado!";
+            buttonElement.style.backgroundColor = "#28a745"; // Verde éxito
+            buttonElement.style.color = "white";
+            buttonElement.style.borderColor = "#28a745";
+
+            setTimeout(() => {
+              buttonElement.innerText = originalText;
+              buttonElement.style.backgroundColor = "transparent";
+              buttonElement.style.color = "#cccccc";
+              buttonElement.style.borderColor = "#555";
+            }, 2000);
+          })
+          .catch((err) => {
+            console.error("Error al copiar el texto: ", err);
+          });
+      }
+    </script>
+  </body>
+</html>
